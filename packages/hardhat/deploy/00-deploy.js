@@ -1,68 +1,25 @@
-// deploy/00_deploy_my_contract.js
+// We require the Hardhat Runtime Environment explicitly here. This is optional
+// but useful for running the script in a standalone fashion through `node <script>`.
+//
+// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
+// will compile your contracts, add the Hardhat Runtime Environment's members to the
+// global scope, and execute the script.
+const hre = require("hardhat");
 
-// const { ethers } = require("hardhat");
+async function main() {
+  const TargetContract = await hre.ethers.getContractFactory("AuctionHouse");
+  const deployTarget = await TargetContract.deploy();
 
-// const sleep = (ms) =>
-//   new Promise((r) =>
-//     setTimeout(() => {
-//       console.log(`waited for ${(ms / 1000).toFixed(3)} seconds`);
-//       r();
-//     }, ms)
-//   );
+  await deployTarget.deployed();
 
-module.exports = async ({ getNamedAccounts, deployments }) => {
-  const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
+  console.log(
+    `Contract Deployed at ${deployTarget.address}`
+  );
+}
 
-  await deploy("Greeter", {
-    from: deployer,
-    args: ["hello world"],
-    log: true,
-  });
-
-  await deploy("Storage", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
-
-  await deploy("SupportToken", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
-
-  // Getting a previously deployed contract
-  // const Greeter = new ethers.Contract("Greeter", deployer);
-
-  // await Greeter.setGreeting("Hello Celo!");
-
-  /*
-  // If you want to send value to an address from the deployer
-  
-  const deployerWallet = ethers.provider.getSigner()
-  await deployerWallet.sendTransaction({
-    to: "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-    value: ethers.utils.parseEther("0.001")
-  })
-  */
-
-  /*
-  //If you want to send some CELO to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
-    value: ethers.utils.parseEther("0.05")
-  });
-  */
-
-  /*
-  //If you want to link a library into your contract:
-  // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const yourContract = await deploy("YourContract", [], {}, {
-    LibraryName: **LibraryAddress**
-  });
-  */
-};
-
-module.exports.tags = ["Greeter", "Storage", "SupportToken"];
+// We recommend this pattern to be able to use async/await everywhere
+// and properly handle errors.
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
